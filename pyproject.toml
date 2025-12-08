@@ -1,0 +1,13 @@
+[project]
+name = "void-halo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.124.0",
+    "jmcomic>=2.6.10",
+    "standard-imghdr>=3.13.0",
+    "uvicorn>=0.38.0",
+    "watchdog>=6.0.0",
+]

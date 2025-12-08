@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Void Halo | JMComic 下载器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: radial-gradient(circle at 20% 20%, rgba(82,125,255,.25), transparent 30%),
+             radial-gradient(circle at 80% 10%, rgba(255,115,168,.28), transparent 28%),
+             radial-gradient(circle at 40% 80%, rgba(115,255,186,.25), transparent 30%),
+             #0b0c10;
+      --card: rgba(19,21,28,0.9);
+      --muted: #9aa0b5;
+      --accent: #68d2ff;
+      --accent-2: #f75d9b;
+      --text: #f8f9fb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .shell {
+      width: min(1100px, 100%);
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 20px 22px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+    h1 { margin: 0 0 4px; font-size: 28px; letter-spacing: 0.5px; }
+    p.sub { margin: 0; color: var(--muted); }
+    form { margin-top: 14px; display: flex; gap: 12px; flex-wrap: wrap; }
+    input[type="text"] {
+      flex: 1 1 220px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+    }
+    input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(104,210,255,0.25); }
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 15px;
+      cursor: pointer;
+      color: #0b0c10;
+      background: linear-gradient(135deg, var(--accent), #8df2ff);
+      font-weight: 600;
+      min-width: 120px;
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+    button:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(104,210,255,0.3); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .metric-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    .metric { padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,0.05); min-width: 140px; }
+    .label { color: var(--muted); font-size: 13px; }
+    .value { font-size: 16px; font-weight: 600; }
+    .progress {
+      position: relative;
+      width: 100%;
+      height: 16px;
+      margin: 16px 0 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+    .bar {
+      position: absolute;
+      inset: 0;
+      width: 0;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 160ms ease;
+    }
+    .log-box {
+      max-height: 360px;
+      overflow: auto;
+      padding: 10px 0 4px;
+      margin: 0;
+      list-style: none;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 13px;
+    }
+    .log-box li { padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); color: #d5d9e6; }
+    .log-box li:nth-child(odd) { background: rgba(255,255,255,0.02); }
+    .muted { color: var(--muted); }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    a.btn-link {
+      text-decoration: none;
+      color: #0b0c10;
+      background: linear-gradient(135deg, #8bf8c1, #5ed9ff);
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .status-running { background: #5ed9ff; }
+    .status-ready { background: #71f09d; }
+    .status-failed { background: #ff6b6b; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="card">
+      <h1>Void Halo</h1>
+      <p class="sub">用 FastAPI + JMComic 下载器，实时日志 & 进度回传</p>
+
+      <form id="job-form">
+        <input type="text" name="album_id" placeholder="输入漫画 ID，例如 438696" required />
+        <button type="submit" id="start-btn">开始下载</button>
+      </form>
+
+      <div class="metric-row">
+        <div class="metric">
+          <div class="label">任务 ID</div>
+          <div class="value" id="job-id">-</div>
+        </div>
+        <div class="metric">
+          <div class="label">漫画名</div>
+          <div class="value" id="job-title">-</div>
+        </div>
+        <div class="metric">
+          <div class="label">状态</div>
+          <div class="value"><span class="status-dot" id="status-dot"></span><span id="job-status">待开始</span></div>
+        </div>
+      </div>
+
+      <div class="progress" aria-label="进度">
+        <div class="bar" id="bar"></div>
+      </div>
+      <div class="label" id="progress-text">0%</div>
+
+      <div class="actions" style="margin-top:12px;">
+        <a id="download-link" class="btn-link" href="#" style="display:none;">下载 Zip</a>
+        <button type="button" id="delete-btn" style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.12);">删除文件</button>
+      </div>
+    </section>
+
+    <section class="card" style="min-height:380px;">
+      <div class="pill">实时日志 / 目录事件</div>
+      <ul class="log-box" id="logs"></ul>
+      <div class="label muted">关闭页面或点击“删除文件”会清理服务器临时目录。</div>
+    </section>
+  </div>
+
+<script>
+(() => {
+  const state = { jobId: null, ws: null, autoScroll: true };
+  const $ = (id) => document.getElementById(id);
+  const bar = $('bar');
+  const progressText = $('progress-text');
+  const statusDot = $('status-dot');
+  const jobStatus = $('job-status');
+  const jobTitle = $('job-title');
+  const jobIdEl = $('job-id');
+  const logsEl = $('logs');
+  const downloadLink = $('download-link');
+  const deleteBtn = $('delete-btn');
+
+  function setStatus(status, message) {
+    jobStatus.textContent = message || status;
+    statusDot.className = 'status-dot ' + (status === 'completed' ? 'status-ready' : status === 'failed' ? 'status-failed' : 'status-running');
+  }
+
+  function setProgress(value) {
+    const pct = Math.max(0, Math.min(1, value || 0));
+    bar.style.width = `${(pct * 100).toFixed(1)}%`;
+    progressText.textContent = `${(pct * 100).toFixed(1)}%`;
+  }
+
+  function addLog(msg) {
+    const li = document.createElement('li');
+    li.textContent = msg;
+    logsEl.appendChild(li);
+    if (state.autoScroll) {
+      logsEl.scrollTop = logsEl.scrollHeight;
+    }
+  }
+
+  function handleSnapshot(payload) {
+    if (payload.job) {
+      jobIdEl.textContent = payload.job.id;
+      jobTitle.textContent = payload.job.title || '-';
+      setStatus(payload.job.status, payload.job.status);
+      setProgress(payload.job.progress || 0);
+    }
+    (payload.events || []).forEach(evt => handleEvent(evt));
+  }
+
+  function handleEvent(evt) {
+    if (!evt || !evt.type) return;
+    switch (evt.type) {
+      case 'status':
+        setStatus('running', evt.message || '');
+        addLog(evt.message || '');
+        break;
+      case 'progress':
+        if (evt.value !== undefined) setProgress(evt.value);
+        if (evt.message) addLog(evt.message);
+        break;
+      case 'log':
+        addLog(evt.message);
+        break;
+      case 'error':
+        setStatus('failed', evt.message || '出错了');
+        addLog('[错误] ' + (evt.message || '')); 
+        break;
+      case 'ready':
+        setStatus('completed', '打包完成');
+        setProgress(1);
+        downloadLink.href = evt.download;
+        downloadLink.style.display = 'inline-flex';
+        addLog('✅ 打包完成，可下载');
+        break;
+      case 'snapshot':
+        handleSnapshot(evt);
+        break;
+    }
+  }
+
+  function openSocket(jobId) {
+    if (state.ws) {
+      state.ws.close();
+    }
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    const ws = new WebSocket(`${proto}://${location.host}/ws/jobs/${jobId}`);
+    state.ws = ws;
+    ws.onmessage = (evt) => {
+      try { handleEvent(JSON.parse(evt.data)); } catch (e) { console.error(e); }
+    };
+    ws.onclose = () => addLog('WebSocket 断开');
+  }
+
+  document.getElementById('job-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const albumId = e.target.album_id.value.trim();
+    if (!albumId) return;
+    $('start-btn').disabled = true;
+    setStatus('running', '创建任务');
+    setProgress(0);
+    logsEl.innerHTML = '';
+    downloadLink.style.display = 'none';
+
+    const res = await fetch('/api/jobs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ album_id: albumId })
+    });
+    if (!res.ok) {
+      addLog('创建任务失败');
+      $('start-btn').disabled = false;
+      return;
+    }
+    const data = await res.json();
+    state.jobId = data.job_id;
+    jobIdEl.textContent = data.job_id;
+    setStatus('running', '准备下载');
+    openSocket(state.jobId);
+    $('start-btn').disabled = false;
+  });
+
+  deleteBtn.addEventListener('click', async () => {
+    if (!state.jobId) return;
+    await fetch(`/api/jobs/${state.jobId}`, { method: 'DELETE' });
+    addLog('已删除服务器文件');
+    jobStatus.textContent = '已删除';
+    bar.style.width = '0%';
+    downloadLink.style.display = 'none';
+  });
+})();
+</script>
+</body>
+</html>
