@@ -131,6 +131,35 @@
     .status-running { background: #5ed9ff; }
     .status-ready { background: #71f09d; }
     .status-failed { background: #ff6b6b; }
+    .tree-box {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.03);
+    }
+    .tree-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .tree-meta {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 60%;
+      text-align: right;
+    }
+    .tree-output {
+      margin: 8px 0 0;
+      white-space: pre;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      max-height: 180px;
+      overflow: auto;
+      color: #d5d9e6;
+      background: rgba(0,0,0,0.18);
+      border-radius: 8px;
+      padding: 10px;
+    }
   </style>
 </head>
 <body>
@@ -173,13 +202,20 @@
     <section class="card" style="min-height:380px;">
       <div class="pill">实时日志 / 目录事件</div>
       <ul class="log-box" id="logs"></ul>
+      <div class="tree-box">
+        <div class="tree-head">
+          <span class="pill">暂存目录</span>
+          <span class="tree-meta" id="tree-meta">等待任务</span>
+        </div>
+        <pre class="tree-output" id="tree-output">未加载</pre>
+      </div>
       <div class="label muted">关闭页面或点击“删除文件”会清理服务器临时目录。</div>
     </section>
   </div>
 
 <script>
 (() => {
-  const state = { jobId: null, ws: null, autoScroll: true };
+  const state = { jobId: null, ws: null, autoScroll: true, treeTimer: null };
   const $ = (id) => document.getElementById(id);
   const bar = $('bar');
   const progressText = $('progress-text');
@@ -190,6 +226,8 @@
   const logsEl = $('logs');
   const downloadLink = $('download-link');
   const deleteBtn = $('delete-btn');
+  const treeOutput = $('tree-output');
+  const treeMeta = $('tree-meta');
 
   function setStatus(status, message) {
     jobStatus.textContent = message || status;
@@ -208,6 +246,57 @@
     logsEl.appendChild(li);
     if (state.autoScroll) {
       logsEl.scrollTop = logsEl.scrollHeight;
+    }
+  }
+
+  function renderTree(lines, root, generatedAt) {
+    const content = Array.isArray(lines) && lines.length ? lines.join('\n') : '(空目录)';
+    treeOutput.textContent = content;
+    const ts = generatedAt ? new Date(generatedAt).toLocaleTimeString() : '';
+    if (root && ts) {
+      treeMeta.textContent = `${root} · ${ts}`;
+    } else if (ts) {
+      treeMeta.textContent = ts;
+    } else {
+      treeMeta.textContent = '已刷新';
+    }
+  }
+
+  async function fetchTree() {
+    if (!state.jobId) return;
+    try {
+      const res = await fetch(`/api/jobs/${state.jobId}/tree`);
+      if (res.status === 404) {
+        treeOutput.textContent = '目录已清理';
+        treeMeta.textContent = '任务不存在或已删除';
+        stopTreePolling(false);
+        return;
+      }
+      if (!res.ok) throw new Error('failed');
+      const data = await res.json();
+      renderTree(data.tree, data.root, data.generated_at);
+    } catch (err) {
+      treeOutput.textContent = '无法读取目录';
+      treeMeta.textContent = '稍后重试';
+    }
+  }
+
+  function startTreePolling() {
+    stopTreePolling(false);
+    treeOutput.textContent = '加载中...';
+    treeMeta.textContent = '刷新中';
+    fetchTree();
+    state.treeTimer = setInterval(fetchTree, 1500);
+  }
+
+  function stopTreePolling(clear = true) {
+    if (state.treeTimer) {
+      clearInterval(state.treeTimer);
+      state.treeTimer = null;
+    }
+    if (clear) {
+      treeOutput.textContent = '未加载';
+      treeMeta.textContent = '等待任务';
     }
   }
 
@@ -245,6 +334,7 @@
         downloadLink.href = evt.download;
         downloadLink.style.display = 'inline-flex';
         addLog('✅ 打包完成，可下载');
+        fetchTree().finally(() => stopTreePolling(false));
         break;
       case 'snapshot':
         handleSnapshot(evt);
@@ -290,6 +380,7 @@
     jobIdEl.textContent = data.job_id;
     setStatus('running', '准备下载');
     openSocket(state.jobId);
+    startTreePolling();
     $('start-btn').disabled = false;
   });
 
@@ -300,6 +391,9 @@
     jobStatus.textContent = '已删除';
     bar.style.width = '0%';
     downloadLink.style.display = 'none';
+    stopTreePolling();
+    treeOutput.textContent = '目录已删除';
+    treeMeta.textContent = '';
   });
 })();
 </script>

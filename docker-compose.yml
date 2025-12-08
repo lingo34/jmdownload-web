@@ -1,0 +1,11 @@
+services:
+  void-halo:
+    image: ghcr.io/${GHCR_OWNER:-your-gh-username}/void-halo:latest
+    ports:
+      - "7392:7392"
+    environment:
+      # 可选：自定义工作根目录（例如挂到 tmpfs）
+      - VOID_HALO_BASEDIR=/tmp/void-halo
+    volumes:
+      - /tmp/void-halo:/tmp/void-halo
+    restart: unless-stopped
