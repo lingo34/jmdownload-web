@@ -1,5 +1,0 @@
-fastapi[standard]>=0.124.0
-jmcomic>=2.6.10
-standard-imghdr>=3.13.0
-uvicorn>=0.38.0
-watchdog>=6.0.0
