@@ -674,16 +674,7 @@
       });
 
       // ==== Single Download ====
-      const singleState = {
-        jobId: null,
-        ws: null,
-        autoScroll: true,
-        treeTimer: null,
-        wsAttempts: 0,
-        reconnectTimer: null,
-        pollTimer: null,
-        lastPolledStatus: null
-      };
+      const singleState = { jobId: null, ws: null, autoScroll: true, treeTimer: null };
       const $ = (id) => document.getElementById(id);
       const bar = $('bar');
       const progressText = $('progress-text');
@@ -696,26 +687,6 @@
       const deleteBtn = $('delete-btn');
       const treeOutput = $('tree-output');
       const treeMeta = $('tree-meta');
-      const wsIndicator = $('ws-indicator');
-      const wsDot = $('ws-dot');
-      const wsLabel = $('ws-label');
-
-      const WS_RETRY_LIMIT = 3;
-      const WS_RETRY_DELAY = 1500;
-      const POLL_INTERVAL = 3500;
-
-      function setWsIndicator(state, scope = '') {
-        const labels = {
-          connecting: 'WS 连接中',
-          connected: 'WS 已连接',
-          reconnecting: 'WS 重连中',
-          polling: 'WS 轮询中',
-          offline: 'WS 未连接'
-        };
-        wsDot.className = `ws-dot ${state}`;
-        const detail = scope ? ` · ${scope}` : '';
-        wsLabel.textContent = (labels[state] || state) + detail;
-      }
 
       function setStatus(status, message) {
         jobStatus.textContent = message || status;
@@ -788,57 +759,6 @@
         }
       }
 
-      function stopSinglePolling() {
-        if (singleState.pollTimer) {
-          clearInterval(singleState.pollTimer);
-          singleState.pollTimer = null;
-        }
-      }
-
-      async function pollSingleStatus() {
-        if (!singleState.jobId) return;
-        try {
-          const res = await fetch(`/api/jobs/${singleState.jobId}`);
-          if (res.status === 404) {
-            addLog('任务不存在，停止轮询');
-            stopSinglePolling();
-            return;
-          }
-          if (!res.ok) throw new Error('poll failed');
-          const job = await res.json();
-          jobIdEl.textContent = job.id;
-          jobTitle.textContent = job.title || '-';
-          setStatus(job.status, job.message || job.status);
-          setProgress(job.progress || 0);
-
-          if (job.status === 'completed') {
-            downloadLink.style.display = 'inline-flex';
-            downloadLink.textContent = job.download_ready ? '下载 Zip' : '打包并下载';
-            downloadLink.dataset.ready = job.download_ready ? 'true' : 'false';
-            if (job.download_ready) {
-              downloadLink.href = `/api/jobs/${job.id}/download`;
-            }
-            stopSinglePolling();
-          }
-
-          if (job.status === 'failed' && singleState.lastPolledStatus !== 'failed') {
-            addLog(job.message ? `❌ ${job.message}` : '❌ 任务失败');
-          }
-
-          singleState.lastPolledStatus = job.status;
-        } catch (err) {
-          console.error('单本轮询失败', err);
-        }
-      }
-
-      function startSinglePolling(reason = '') {
-        stopSinglePolling();
-        if (reason) addLog(reason);
-        setWsIndicator('polling', '单本');
-        pollSingleStatus();
-        singleState.pollTimer = setInterval(pollSingleStatus, POLL_INTERVAL);
-      }
-
       function handleSnapshot(payload) {
         if (payload.job) {
           jobIdEl.textContent = payload.job.id;
@@ -900,62 +820,16 @@
       }
 
       function openSocket(jobId) {
-        if (!jobId) return;
         if (singleState.ws) {
           singleState.ws.close();
-          singleState.ws = null;
         }
-        if (singleState.reconnectTimer) {
-          clearTimeout(singleState.reconnectTimer);
-          singleState.reconnectTimer = null;
-        }
-        singleState.wsAttempts = 0;
-
-        const connect = () => {
-          if (!singleState.jobId) return;
-          setWsIndicator('connecting', '单本');
-          const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-          const ws = new WebSocket(`${proto}://${location.host}/ws/jobs/${jobId}`);
-          singleState.ws = ws;
-          let handled = false;
-
-          ws.onopen = () => {
-            handled = false;
-            singleState.wsAttempts = 0;
-            setWsIndicator('connected', '单本');
-            stopSinglePolling();
-          };
-
-          ws.onmessage = (evt) => {
-            try { handleEvent(JSON.parse(evt.data)); } catch (e) { console.error(e); }
-          };
-
-          const handleFailure = () => {
-            if (handled) return;
-            handled = true;
-            if (singleState.reconnectTimer) {
-              clearTimeout(singleState.reconnectTimer);
-            }
-            singleState.reconnectTimer = setTimeout(() => {
-              if (!singleState.jobId) return;
-              singleState.wsAttempts += 1;
-              if (singleState.wsAttempts > WS_RETRY_LIMIT) {
-                startSinglePolling('WebSocket 多次失败，切换为轮询');
-                return;
-              }
-              setWsIndicator('reconnecting', '单本');
-              connect();
-            }, WS_RETRY_DELAY * Math.min(singleState.wsAttempts, 3));
-          };
-
-          ws.onclose = () => {
-            addLog('WebSocket 断开');
-            handleFailure();
-          };
-          ws.onerror = handleFailure;
+        const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+        const ws = new WebSocket(`${proto}://${location.host}/ws/jobs/${jobId}`);
+        singleState.ws = ws;
+        ws.onmessage = (evt) => {
+          try { handleEvent(JSON.parse(evt.data)); } catch (e) { console.error(e); }
         };
-
-        connect();
+        ws.onclose = () => addLog('WebSocket 断开');
       }
 
       document.getElementById('job-form').addEventListener('submit', async (e) => {
@@ -1031,15 +905,6 @@
 
       function resetSingleUI() {
         singleState.jobId = null;
-        if (singleState.ws) {
-          singleState.ws.close();
-          singleState.ws = null;
-        }
-        if (singleState.reconnectTimer) {
-          clearTimeout(singleState.reconnectTimer);
-          singleState.reconnectTimer = null;
-        }
-        stopSinglePolling();
         jobStatus.textContent = '待开始';
         jobIdEl.textContent = '-';
         jobTitle.textContent = '-';
@@ -1051,19 +916,10 @@
         stopTreePolling();
         treeOutput.textContent = '目录已删除';
         treeMeta.textContent = '';
-        setWsIndicator('offline');
       }
 
       // ==== Batch Download ====
-      const batchState = {
-        jobId: null,
-        ws: null,
-        albums: [],
-        treeTimer: null,
-        wsAttempts: 0,
-        reconnectTimer: null,
-        pollTimer: null
-      };
+      const batchState = { jobId: null, ws: null, albums: [], treeTimer: null };
       const albumListEl = $('album-list');
       const batchStats = $('batch-stats');
       const batchStatus = $('batch-status');
@@ -1113,51 +969,6 @@
           treeOutput.textContent = '未加载';
           treeMeta.textContent = '等待任务';
         }
-      }
-
-      function stopBatchPolling() {
-        if (batchState.pollTimer) {
-          clearInterval(batchState.pollTimer);
-          batchState.pollTimer = null;
-        }
-      }
-
-      async function pollBatchStatus() {
-        if (!batchState.jobId) return;
-        try {
-          const res = await fetch(`/api/batch-jobs/${batchState.jobId}`);
-          if (res.status === 404) {
-            addLog('批量任务不存在，停止轮询');
-            stopBatchPolling();
-            return;
-          }
-          if (!res.ok) throw new Error('poll failed');
-          const job = await res.json();
-          updateBatchUI(job);
-          if (job.albums) renderAlbumList(job.albums);
-
-          if (job.status === 'completed' || job.status === 'cancelled') {
-            batchDownloadLink.style.display = 'inline-flex';
-            batchDownloadLink.textContent = job.download_ready ? '下载 Zip' : '打包并下载';
-            batchDownloadLink.dataset.ready = job.download_ready ? 'true' : 'false';
-            if (job.download_ready) {
-              batchDownloadLink.href = `/api/batch-jobs/${job.id}/download`;
-            }
-            batchCancelBtn.style.display = 'none';
-            batchDeleteBtn.style.display = 'inline-flex';
-            stopBatchPolling();
-          }
-        } catch (err) {
-          console.error('批量轮询失败', err);
-        }
-      }
-
-      function startBatchPolling(reason = '') {
-        stopBatchPolling();
-        if (reason) addLog(reason);
-        setWsIndicator('polling', '批量');
-        pollBatchStatus();
-        batchState.pollTimer = setInterval(pollBatchStatus, POLL_INTERVAL);
       }
 
       // Load saved credentials from localStorage
@@ -1380,62 +1191,16 @@
       }
 
       function openBatchSocket(jobId) {
-        if (!jobId) return;
         if (batchState.ws) {
           batchState.ws.close();
-          batchState.ws = null;
         }
-        if (batchState.reconnectTimer) {
-          clearTimeout(batchState.reconnectTimer);
-          batchState.reconnectTimer = null;
-        }
-        batchState.wsAttempts = 0;
-
-        const connect = () => {
-          if (!batchState.jobId) return;
-          setWsIndicator('connecting', '批量');
-          const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-          const ws = new WebSocket(`${proto}://${location.host}/ws/batch-jobs/${jobId}`);
-          batchState.ws = ws;
-          let handled = false;
-
-          ws.onopen = () => {
-            handled = false;
-            batchState.wsAttempts = 0;
-            setWsIndicator('connected', '批量');
-            stopBatchPolling();
-          };
-
-          ws.onmessage = (evt) => {
-            try { handleBatchEvent(JSON.parse(evt.data)); } catch (e) { console.error(e); }
-          };
-
-          const handleFailure = () => {
-            if (handled) return;
-            handled = true;
-            if (batchState.reconnectTimer) {
-              clearTimeout(batchState.reconnectTimer);
-            }
-            batchState.reconnectTimer = setTimeout(() => {
-              if (!batchState.jobId) return;
-              batchState.wsAttempts += 1;
-              if (batchState.wsAttempts > WS_RETRY_LIMIT) {
-                startBatchPolling('批量 WebSocket 多次失败，切换为轮询');
-                return;
-              }
-              setWsIndicator('reconnecting', '批量');
-              connect();
-            }, WS_RETRY_DELAY * Math.min(batchState.wsAttempts, 3));
-          };
-
-          ws.onclose = () => {
-            addLog('批量下载 WebSocket 断开');
-            handleFailure();
-          };
-          ws.onerror = handleFailure;
+        const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+        const ws = new WebSocket(`${proto}://${location.host}/ws/batch-jobs/${jobId}`);
+        batchState.ws = ws;
+        ws.onmessage = (evt) => {
+          try { handleBatchEvent(JSON.parse(evt.data)); } catch (e) { console.error(e); }
         };
-
-        connect();
+        ws.onclose = () => addLog('批量下载 WebSocket 断开');
       }
 
       document.getElementById('batch-form').addEventListener('submit', async (e) => {
@@ -1534,15 +1299,6 @@
 
       function resetBatchUI() {
         batchState.jobId = null;
-        if (batchState.ws) {
-          batchState.ws.close();
-          batchState.ws = null;
-        }
-        if (batchState.reconnectTimer) {
-          clearTimeout(batchState.reconnectTimer);
-          batchState.reconnectTimer = null;
-        }
-        stopBatchPolling();
         batchStatus.textContent = '准备中';
         batchCompleted.textContent = '0';
         batchTotal.textContent = '0';
@@ -1559,9 +1315,6 @@
         stopBatchTreePolling();
         treeOutput.textContent = '目录已删除';
         treeMeta.textContent = '';
-        if (!singleState.jobId) {
-          setWsIndicator('offline');
-        }
       }
 
       // ==== Cleanup Button ====
@@ -1636,32 +1389,6 @@
               batchDownloadLink.dataset.ready = data.job.zip_path ? 'true' : 'false';
               if (data.job.zip_path) {
                 batchDownloadLink.href = `/api/batch-jobs/${data.job.id}/download`;
-              }
-              batchDeleteBtn.style.display = 'inline-flex';
-            }
-            if (data.job.status === 'running') {
-              openBatchSocket(data.job.id);
-              startBatchTreePolling();
-              batchCancelBtn.style.display = 'inline-flex';
-            } else {
-              fetchBatchTree();
-            }
-            addLog('[恢复] 发现上次的批量任务');
-            // Switch to batch tab
-            document.querySelector('.tab[data-tab="batch"]').click();
-          }
-        } catch (err) {
-          console.error('Failed to restore batch job:', err);
-        }
-      }
-
-      // Restore state when page loads
-      restoreState();
-    })();
-  </script>
-</body>
-
-</html>                batchDownloadLink.href = `/api/batch-jobs/${data.job.id}/download`;
               }
               batchDeleteBtn.style.display = 'inline-flex';
             }
