@@ -1,0 +1,7 @@
+README.md
+pyproject.toml
+void_halo.egg-info/PKG-INFO
+void_halo.egg-info/SOURCES.txt
+void_halo.egg-info/dependency_links.txt
+void_halo.egg-info/requires.txt
+void_halo.egg-info/top_level.txt

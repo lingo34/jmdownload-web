@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="zh-Hans">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,59 +10,118 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: radial-gradient(circle at 20% 20%, rgba(82,125,255,.25), transparent 30%),
-             radial-gradient(circle at 80% 10%, rgba(255,115,168,.28), transparent 28%),
-             radial-gradient(circle at 40% 80%, rgba(115,255,186,.25), transparent 30%),
-             #0b0c10;
-      --card: rgba(19,21,28,0.9);
+      --bg: radial-gradient(circle at 20% 20%, rgba(82, 125, 255, .25), transparent 30%),
+        radial-gradient(circle at 80% 10%, rgba(255, 115, 168, .28), transparent 28%),
+        radial-gradient(circle at 40% 80%, rgba(115, 255, 186, .25), transparent 30%),
+        #0b0c10;
+      --card: rgba(19, 21, 28, 0.9);
       --muted: #9aa0b5;
       --accent: #68d2ff;
       --accent-2: #f75d9b;
       --text: #f8f9fb;
     }
-    * { box-sizing: border-box; }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      overflow-x: hidden;
+    }
+
     body {
       margin: 0;
       font-family: 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, sans-serif;
       color: var(--text);
       background: var(--bg);
       min-height: 100vh;
-      padding: 24px;
+      padding: 16px;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
     }
+
     .shell {
-      width: min(1100px, 100%);
+      width: 100%;
+      max-width: 1100px;
       display: grid;
-      gap: 18px;
+      gap: 16px;
       grid-template-columns: 1.1fr 0.9fr;
     }
+
     @media (max-width: 900px) {
-      .shell { grid-template-columns: 1fr; }
+      .shell {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      body {
+        padding: 8px;
+        align-items: flex-start;
+      }
     }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 6px;
+      }
+
+      .card {
+        padding: 14px 12px;
+        border-radius: 12px;
+      }
+    }
+
     .card {
       background: var(--card);
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 16px;
       padding: 20px 22px;
       backdrop-filter: blur(10px);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      min-width: 0;
+      /* Prevent grid blowout from long content */
+      overflow: hidden;
+      /* Clip any overflowing content */
     }
-    h1 { margin: 0 0 4px; font-size: 28px; letter-spacing: 0.5px; }
-    p.sub { margin: 0; color: var(--muted); }
-    form { margin-top: 14px; display: flex; gap: 12px; flex-wrap: wrap; }
-    input[type="text"] {
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 28px;
+      letter-spacing: 0.5px;
+    }
+
+    p.sub {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    form {
+      margin-top: 14px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    input[type="text"],
+    input[type="password"] {
       flex: 1 1 220px;
       padding: 12px 14px;
       border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.04);
       color: #fff;
       font-size: 16px;
       outline: none;
     }
-    input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(104,210,255,0.25); }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(104, 210, 255, 0.25);
+    }
+
     button {
       border: none;
       border-radius: 10px;
@@ -74,31 +134,64 @@
       min-width: 120px;
       transition: transform 120ms ease, box-shadow 120ms ease;
     }
-    button:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(104,210,255,0.3); }
-    button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(104, 210, 255, 0.3);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
     .pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       padding: 6px 10px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.06);
+      background: rgba(255, 255, 255, 0.06);
       color: var(--muted);
       font-size: 13px;
     }
-    .metric-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-    .metric { padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,0.05); min-width: 140px; }
-    .label { color: var(--muted); font-size: 13px; }
-    .value { font-size: 16px; font-weight: 600; }
+
+    .metric-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .metric {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      min-width: 140px;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .value {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
     .progress {
       position: relative;
       width: 100%;
       height: 16px;
       margin: 16px 0 6px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.06);
+      background: rgba(255, 255, 255, 0.06);
       overflow: hidden;
     }
+
     .bar {
       position: absolute;
       inset: 0;
@@ -106,6 +199,7 @@
       background: linear-gradient(90deg, var(--accent), var(--accent-2));
       transition: width 160ms ease;
     }
+
     .log-box {
       max-height: 360px;
       overflow: auto;
@@ -115,10 +209,27 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 13px;
     }
-    .log-box li { padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); color: #d5d9e6; }
-    .log-box li:nth-child(odd) { background: rgba(255,255,255,0.02); }
-    .muted { color: var(--muted); }
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .log-box li {
+      padding: 6px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #d5d9e6;
+    }
+
+    .log-box li:nth-child(odd) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     a.btn-link {
       text-decoration: none;
       color: #0b0c10;
@@ -127,18 +238,42 @@
       border-radius: 10px;
       font-weight: 700;
     }
-    .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-    .status-running { background: #5ed9ff; }
-    .status-ready { background: #71f09d; }
-    .status-failed { background: #ff6b6b; }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .status-running {
+      background: #5ed9ff;
+    }
+
+    .status-ready {
+      background: #71f09d;
+    }
+
+    .status-failed {
+      background: #ff6b6b;
+    }
+
     .tree-box {
       margin-top: 12px;
       padding: 10px 12px;
       border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.07);
-      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      background: rgba(255, 255, 255, 0.03);
     }
-    .tree-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+    .tree-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
     .tree-meta {
       color: var(--muted);
       font-size: 12px;
@@ -148,6 +283,7 @@
       max-width: 60%;
       text-align: right;
     }
+
     .tree-output {
       margin: 8px 0 0;
       white-space: pre;
@@ -156,46 +292,352 @@
       max-height: 180px;
       overflow: auto;
       color: #d5d9e6;
-      background: rgba(0,0,0,0.18);
+      background: rgba(0, 0, 0, 0.18);
       border-radius: 8px;
       padding: 10px;
     }
+
+    /* Tab styles */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 4px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 150ms ease;
+    }
+
+    .tab:hover {
+      color: var(--text);
+    }
+
+    .tab.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Album list (todo-list style) */
+    .album-list {
+      list-style: none;
+      margin: 12px 0 0;
+      padding: 0;
+      max-height: 300px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      min-width: 0;
+      /* Prevent content from pushing container */
+    }
+
+    .album-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 150ms ease;
+    }
+
+    .album-item.downloading {
+      background: rgba(104, 210, 255, 0.1);
+      border-color: rgba(104, 210, 255, 0.3);
+    }
+
+    .album-item.completed {
+      background: rgba(113, 240, 157, 0.1);
+      border-color: rgba(113, 240, 157, 0.3);
+    }
+
+    .album-item.failed {
+      background: rgba(255, 107, 107, 0.1);
+      border-color: rgba(255, 107, 107, 0.3);
+    }
+
+    .album-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .album-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .album-title {
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .album-id {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .album-progress {
+      width: 60px;
+      text-align: right;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .mini-bar {
+      width: 80px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .mini-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 150ms ease;
+    }
+
+    .retry-btn {
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      background: rgba(255, 165, 0, 0.2);
+      color: #ffa500;
+      border: 1px solid rgba(255, 165, 0, 0.3);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .retry-btn:hover {
+      background: rgba(255, 165, 0, 0.3);
+    }
+
+    .retry-btn:disabled {
+      opacity: 0.5;
+      cursor: wait;
+    }
+
+    .album-error {
+      font-size: 11px;
+      color: #ff6b6b;
+      margin-top: 2px;
+      word-break: break-all;
+      max-width: 200px;
+    }
+
+    /* Batch stats */
+    .batch-stats {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .batch-stat {
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .batch-stat strong {
+      color: var(--accent);
+    }
+
+    /* Mobile responsive improvements */
+    @media (max-width: 600px) {
+      form {
+        flex-direction: column;
+      }
+
+      input[type="text"],
+      input[type="password"] {
+        flex: 1 1 100%;
+        min-width: 0;
+      }
+
+      button {
+        width: 100%;
+        min-width: unset;
+        padding: 14px 16px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      p.sub {
+        font-size: 13px;
+      }
+
+      .metric {
+        min-width: 0;
+        flex: 1 1 45%;
+      }
+
+      .log-box {
+        max-height: 260px;
+        font-size: 11px;
+      }
+
+      .log-box li {
+        padding: 5px 8px;
+        word-break: break-all;
+      }
+
+      .tree-output {
+        max-height: 140px;
+        font-size: 10px;
+      }
+
+      .album-title {
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.3;
+      }
+
+      .album-item {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .album-progress,
+      .mini-bar {
+        width: auto;
+        flex-shrink: 0;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .actions button,
+      .actions a {
+        width: 100%;
+        text-align: center;
+      }
+
+      .tabs {
+        flex-direction: column;
+      }
+
+      .tab {
+        padding: 12px;
+      }
+    }
+
+    /* Ensure long text doesn't overflow */
+    .value {
+      word-break: break-word;
+    }
+
+    .tree-meta {
+      max-width: 50%;
+    }
   </style>
 </head>
+
 <body>
   <div class="shell">
     <section class="card">
       <h1>Void Halo</h1>
       <p class="sub">用 FastAPI + JMComic 下载器，实时日志 & 进度回传</p>
 
-      <form id="job-form">
-        <input type="text" name="album_id" placeholder="输入漫画 ID，例如 438696" required />
-        <button type="submit" id="start-btn">开始下载</button>
-      </form>
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" data-tab="single">单本下载</button>
+        <button class="tab" data-tab="batch">批量收藏下载</button>
+      </div>
 
-      <div class="metric-row">
-        <div class="metric">
-          <div class="label">任务 ID</div>
-          <div class="value" id="job-id">-</div>
+      <!-- Single Download Tab -->
+      <div id="tab-single" class="tab-content active">
+        <form id="job-form">
+          <input type="text" name="album_id" placeholder="输入漫画 ID，例如 438696" required />
+          <button type="submit" id="start-btn">开始下载</button>
+        </form>
+
+        <div class="metric-row">
+          <div class="metric">
+            <div class="label">任务 ID</div>
+            <div class="value" id="job-id">-</div>
+          </div>
+          <div class="metric">
+            <div class="label">漫画名</div>
+            <div class="value" id="job-title">-</div>
+          </div>
+          <div class="metric">
+            <div class="label">状态</div>
+            <div class="value"><span class="status-dot" id="status-dot"></span><span id="job-status">待开始</span></div>
+          </div>
         </div>
-        <div class="metric">
-          <div class="label">漫画名</div>
-          <div class="value" id="job-title">-</div>
+
+        <div class="progress" aria-label="进度">
+          <div class="bar" id="bar"></div>
         </div>
-        <div class="metric">
-          <div class="label">状态</div>
-          <div class="value"><span class="status-dot" id="status-dot"></span><span id="job-status">待开始</span></div>
+        <div class="label" id="progress-text">0%</div>
+
+        <div class="actions" style="margin-top:12px;">
+          <a id="download-link" class="btn-link" href="#" style="display:none;">下载 Zip</a>
+          <button type="button" id="delete-btn"
+            style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.12);">删除文件</button>
         </div>
       </div>
 
-      <div class="progress" aria-label="进度">
-        <div class="bar" id="bar"></div>
-      </div>
-      <div class="label" id="progress-text">0%</div>
+      <!-- Batch Download Tab -->
+      <div id="tab-batch" class="tab-content">
+        <form id="batch-form">
+          <input type="text" name="username" placeholder="JMComic 用户名" required />
+          <input type="password" name="password" placeholder="密码" required />
+          <button type="submit" id="batch-start-btn">开始批量下载</button>
+        </form>
 
-      <div class="actions" style="margin-top:12px;">
-        <a id="download-link" class="btn-link" href="#" style="display:none;">下载 Zip</a>
-        <button type="button" id="delete-btn" style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.12);">删除文件</button>
+        <div class="batch-stats" id="batch-stats" style="display:none;">
+          <div class="batch-stat">状态: <strong id="batch-status">准备中</strong></div>
+          <div class="batch-stat">进度: <strong id="batch-completed">0</strong> / <strong id="batch-total">0</strong>
+          </div>
+        </div>
+
+        <div class="progress" aria-label="总进度" id="batch-progress-container" style="display:none;">
+          <div class="bar" id="batch-bar"></div>
+        </div>
+        <div class="label" id="batch-progress-text" style="display:none;">0%</div>
+
+        <ul class="album-list" id="album-list"></ul>
+
+        <div class="actions" style="margin-top:12px;">
+          <a id="batch-download-link" class="btn-link" href="#" style="display:none;">下载全部 Zip</a>
+          <button type="button" id="batch-cancel-btn"
+            style="display:none; background:rgba(255,107,107,0.2); color:#ff6b6b; border:1px solid rgba(255,107,107,0.3);">取消下载</button>
+          <button type="button" id="batch-delete-btn"
+            style="display:none; background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.12);">删除文件</button>
+        </div>
       </div>
     </section>
 
@@ -209,193 +651,767 @@
         </div>
         <pre class="tree-output" id="tree-output">未加载</pre>
       </div>
-      <div class="label muted">关闭页面或点击“删除文件”会清理服务器临时目录。</div>
+      <div style="margin-top:8px;">
+        <button type="button" id="cleanup-btn"
+          style="background:rgba(255,107,107,0.15); color:#ff6b6b; border:1px solid rgba(255,107,107,0.25);">🗑️
+          清理所有数据</button>
+        <span class="label muted" style="margin-left:8px;">服务器重启会自动清理暂存目录</span>
+      </div>
     </section>
   </div>
 
-<script>
-(() => {
-  const state = { jobId: null, ws: null, autoScroll: true, treeTimer: null };
-  const $ = (id) => document.getElementById(id);
-  const bar = $('bar');
-  const progressText = $('progress-text');
-  const statusDot = $('status-dot');
-  const jobStatus = $('job-status');
-  const jobTitle = $('job-title');
-  const jobIdEl = $('job-id');
-  const logsEl = $('logs');
-  const downloadLink = $('download-link');
-  const deleteBtn = $('delete-btn');
-  const treeOutput = $('tree-output');
-  const treeMeta = $('tree-meta');
+  <script>
+    (() => {
+      // ==== Tab switching ====
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        });
+      });
 
-  function setStatus(status, message) {
-    jobStatus.textContent = message || status;
-    statusDot.className = 'status-dot ' + (status === 'completed' ? 'status-ready' : status === 'failed' ? 'status-failed' : 'status-running');
-  }
+      // ==== Single Download ====
+      const singleState = { jobId: null, ws: null, autoScroll: true, treeTimer: null };
+      const $ = (id) => document.getElementById(id);
+      const bar = $('bar');
+      const progressText = $('progress-text');
+      const statusDot = $('status-dot');
+      const jobStatus = $('job-status');
+      const jobTitle = $('job-title');
+      const jobIdEl = $('job-id');
+      const logsEl = $('logs');
+      const downloadLink = $('download-link');
+      const deleteBtn = $('delete-btn');
+      const treeOutput = $('tree-output');
+      const treeMeta = $('tree-meta');
 
-  function setProgress(value) {
-    const pct = Math.max(0, Math.min(1, value || 0));
-    bar.style.width = `${(pct * 100).toFixed(1)}%`;
-    progressText.textContent = `${(pct * 100).toFixed(1)}%`;
-  }
-
-  function addLog(msg) {
-    const li = document.createElement('li');
-    li.textContent = msg;
-    logsEl.appendChild(li);
-    if (state.autoScroll) {
-      logsEl.scrollTop = logsEl.scrollHeight;
-    }
-  }
-
-  function renderTree(lines, root, generatedAt) {
-    const content = Array.isArray(lines) && lines.length ? lines.join('\n') : '(空目录)';
-    treeOutput.textContent = content;
-    const ts = generatedAt ? new Date(generatedAt).toLocaleTimeString() : '';
-    if (root && ts) {
-      treeMeta.textContent = `${root} · ${ts}`;
-    } else if (ts) {
-      treeMeta.textContent = ts;
-    } else {
-      treeMeta.textContent = '已刷新';
-    }
-  }
-
-  async function fetchTree() {
-    if (!state.jobId) return;
-    try {
-      const res = await fetch(`/api/jobs/${state.jobId}/tree`);
-      if (res.status === 404) {
-        treeOutput.textContent = '目录已清理';
-        treeMeta.textContent = '任务不存在或已删除';
-        stopTreePolling(false);
-        return;
+      function setStatus(status, message) {
+        jobStatus.textContent = message || status;
+        statusDot.className = 'status-dot ' + (status === 'completed' ? 'status-ready' : status === 'failed' ? 'status-failed' : 'status-running');
       }
-      if (!res.ok) throw new Error('failed');
-      const data = await res.json();
-      renderTree(data.tree, data.root, data.generated_at);
-    } catch (err) {
-      treeOutput.textContent = '无法读取目录';
-      treeMeta.textContent = '稍后重试';
-    }
-  }
 
-  function startTreePolling() {
-    stopTreePolling(false);
-    treeOutput.textContent = '加载中...';
-    treeMeta.textContent = '刷新中';
-    fetchTree();
-    state.treeTimer = setInterval(fetchTree, 1500);
-  }
+      function setProgress(value) {
+        const pct = Math.max(0, Math.min(1, value || 0));
+        bar.style.width = `${(pct * 100).toFixed(1)}%`;
+        progressText.textContent = `${(pct * 100).toFixed(1)}%`;
+      }
 
-  function stopTreePolling(clear = true) {
-    if (state.treeTimer) {
-      clearInterval(state.treeTimer);
-      state.treeTimer = null;
-    }
-    if (clear) {
-      treeOutput.textContent = '未加载';
-      treeMeta.textContent = '等待任务';
-    }
-  }
+      function addLog(msg) {
+        const li = document.createElement('li');
+        li.textContent = msg;
+        logsEl.appendChild(li);
+        if (singleState.autoScroll) {
+          logsEl.scrollTop = logsEl.scrollHeight;
+        }
+      }
 
-  function handleSnapshot(payload) {
-    if (payload.job) {
-      jobIdEl.textContent = payload.job.id;
-      jobTitle.textContent = payload.job.title || '-';
-      setStatus(payload.job.status, payload.job.status);
-      setProgress(payload.job.progress || 0);
-    }
-    (payload.events || []).forEach(evt => handleEvent(evt));
-  }
+      function renderTree(lines, root, generatedAt) {
+        const content = Array.isArray(lines) && lines.length ? lines.join('\n') : '(空目录)';
+        treeOutput.textContent = content;
+        const ts = generatedAt ? new Date(generatedAt).toLocaleTimeString() : '';
+        if (root && ts) {
+          treeMeta.textContent = `${root} · ${ts}`;
+        } else if (ts) {
+          treeMeta.textContent = ts;
+        } else {
+          treeMeta.textContent = '已刷新';
+        }
+      }
 
-  function handleEvent(evt) {
-    if (!evt || !evt.type) return;
-    switch (evt.type) {
-      case 'status':
-        setStatus('running', evt.message || '');
-        addLog(evt.message || '');
-        break;
-      case 'progress':
-        if (evt.value !== undefined) setProgress(evt.value);
-        if (evt.message) addLog(evt.message);
-        break;
-      case 'log':
-        addLog(evt.message);
-        break;
-      case 'error':
-        setStatus('failed', evt.message || '出错了');
-        addLog('[错误] ' + (evt.message || '')); 
-        break;
-      case 'ready':
-        setStatus('completed', '打包完成');
-        setProgress(1);
-        downloadLink.href = evt.download;
-        downloadLink.style.display = 'inline-flex';
-        addLog('✅ 打包完成，可下载');
-        fetchTree().finally(() => stopTreePolling(false));
-        break;
-      case 'snapshot':
-        handleSnapshot(evt);
-        break;
-    }
-  }
+      async function fetchTree() {
+        if (!singleState.jobId) return;
+        try {
+          const res = await fetch(`/api/jobs/${singleState.jobId}/tree`);
+          if (res.status === 404) {
+            treeOutput.textContent = '目录已清理';
+            treeMeta.textContent = '任务不存在或已删除';
+            stopTreePolling(false);
+            return;
+          }
+          if (!res.ok) throw new Error('failed');
+          const data = await res.json();
+          renderTree(data.tree, data.root, data.generated_at);
+        } catch (err) {
+          treeOutput.textContent = '无法读取目录';
+          treeMeta.textContent = '稍后重试';
+        }
+      }
 
-  function openSocket(jobId) {
-    if (state.ws) {
-      state.ws.close();
-    }
-    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-    const ws = new WebSocket(`${proto}://${location.host}/ws/jobs/${jobId}`);
-    state.ws = ws;
-    ws.onmessage = (evt) => {
-      try { handleEvent(JSON.parse(evt.data)); } catch (e) { console.error(e); }
-    };
-    ws.onclose = () => addLog('WebSocket 断开');
-  }
+      function startTreePolling() {
+        stopTreePolling(false);
+        treeOutput.textContent = '加载中...';
+        treeMeta.textContent = '刷新中';
+        fetchTree();
+        singleState.treeTimer = setInterval(fetchTree, 1500);
+      }
 
-  document.getElementById('job-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const albumId = e.target.album_id.value.trim();
-    if (!albumId) return;
-    $('start-btn').disabled = true;
-    setStatus('running', '创建任务');
-    setProgress(0);
-    logsEl.innerHTML = '';
-    downloadLink.style.display = 'none';
+      function stopTreePolling(clear = true) {
+        if (singleState.treeTimer) {
+          clearInterval(singleState.treeTimer);
+          singleState.treeTimer = null;
+        }
+        if (clear) {
+          treeOutput.textContent = '未加载';
+          treeMeta.textContent = '等待任务';
+        }
+      }
 
-    const res = await fetch('/api/jobs', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ album_id: albumId })
-    });
-    if (!res.ok) {
-      addLog('创建任务失败');
-      $('start-btn').disabled = false;
-      return;
-    }
-    const data = await res.json();
-    state.jobId = data.job_id;
-    jobIdEl.textContent = data.job_id;
-    setStatus('running', '准备下载');
-    openSocket(state.jobId);
-    startTreePolling();
-    $('start-btn').disabled = false;
-  });
+      function handleSnapshot(payload) {
+        if (payload.job) {
+          jobIdEl.textContent = payload.job.id;
+          jobTitle.textContent = payload.job.title || '-';
+          setStatus(payload.job.status, payload.job.status);
+          setProgress(payload.job.progress || 0);
+        }
+        (payload.events || []).forEach(evt => handleEvent(evt));
+      }
 
-  deleteBtn.addEventListener('click', async () => {
-    if (!state.jobId) return;
-    await fetch(`/api/jobs/${state.jobId}`, { method: 'DELETE' });
-    addLog('已删除服务器文件');
-    jobStatus.textContent = '已删除';
-    bar.style.width = '0%';
-    downloadLink.style.display = 'none';
-    stopTreePolling();
-    treeOutput.textContent = '目录已删除';
-    treeMeta.textContent = '';
-  });
-})();
-</script>
+      function handleEvent(evt) {
+        if (!evt || !evt.type) return;
+        switch (evt.type) {
+          case 'status':
+            setStatus('running', evt.message || '');
+            addLog(evt.message || '');
+            break;
+          case 'progress':
+            if (evt.value !== undefined) setProgress(evt.value);
+            if (evt.message) addLog(evt.message);
+            break;
+          case 'log':
+            addLog(evt.message);
+            break;
+          case 'error':
+            setStatus('failed', evt.message || '出错了');
+            addLog('[错误] ' + (evt.message || ''));
+            break;
+          case 'packing':
+            setStatus('running', evt.message || '打包中...');
+            addLog(evt.message || '打包中...');
+            break;
+          case 'zip_ready':
+            downloadLink.href = evt.download;
+            downloadLink.style.display = 'inline-flex';
+            downloadLink.textContent = '下载 Zip';
+            downloadLink.dataset.ready = 'true';
+            addLog('✅ ' + (evt.message || '打包完成'));
+            break;
+          case 'ready':
+            setStatus('completed', evt.message || '下载完成');
+            setProgress(1);
+            // Show download button - will trigger prepare-download
+            downloadLink.style.display = 'inline-flex';
+            downloadLink.textContent = '打包并下载';
+            downloadLink.dataset.ready = 'false';
+            addLog('✅ 下载完成，点击按钮打包');
+            fetchTree().finally(() => stopTreePolling(false));
+            break;
+          case 'cancelled':
+            setStatus('cancelled', evt.message || '已取消');
+            addLog(evt.message || '已取消');
+            stopTreePolling(false);
+            break;
+          case 'snapshot':
+            handleSnapshot(evt);
+            break;
+        }
+      }
+
+      function openSocket(jobId) {
+        if (singleState.ws) {
+          singleState.ws.close();
+        }
+        const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+        const ws = new WebSocket(`${proto}://${location.host}/ws/jobs/${jobId}`);
+        singleState.ws = ws;
+        ws.onmessage = (evt) => {
+          try { handleEvent(JSON.parse(evt.data)); } catch (e) { console.error(e); }
+        };
+        ws.onclose = () => addLog('WebSocket 断开');
+      }
+
+      document.getElementById('job-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const albumId = e.target.album_id.value.trim();
+        if (!albumId) return;
+        $('start-btn').disabled = true;
+        setStatus('running', '创建任务');
+        setProgress(0);
+        logsEl.innerHTML = '';
+        downloadLink.style.display = 'none';
+
+        const res = await fetch('/api/jobs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ album_id: albumId })
+        });
+        if (!res.ok) {
+          addLog('创建任务失败');
+          $('start-btn').disabled = false;
+          return;
+        }
+        const data = await res.json();
+        singleState.jobId = data.job_id;
+        jobIdEl.textContent = data.job_id;
+        setStatus('running', '准备下载');
+        openSocket(singleState.jobId);
+        startTreePolling();
+        $('start-btn').disabled = false;
+      });
+
+      // Download link - triggers prepare-download for lazy zip
+      downloadLink.addEventListener('click', async (e) => {
+        if (downloadLink.dataset.ready === 'true') {
+          // Already zipped, proceed with download
+          return;
+        }
+        e.preventDefault();
+        if (!singleState.jobId) return;
+
+        downloadLink.textContent = '打包中...';
+        downloadLink.style.pointerEvents = 'none';
+
+        try {
+          const res = await fetch(`/api/jobs/${singleState.jobId}/prepare-download`, { method: 'POST' });
+          if (!res.ok) {
+            const err = await res.json();
+            addLog('打包失败: ' + (err.detail || '未知错误'));
+            downloadLink.textContent = '重试打包';
+            downloadLink.style.pointerEvents = 'auto';
+            return;
+          }
+          const data = await res.json();
+          downloadLink.href = data.download;
+          downloadLink.dataset.ready = 'true';
+          downloadLink.textContent = '下载 Zip';
+          downloadLink.style.pointerEvents = 'auto';
+          // Auto-click to download
+          downloadLink.click();
+        } catch (err) {
+          addLog('打包请求失败');
+          downloadLink.textContent = '重试打包';
+          downloadLink.style.pointerEvents = 'auto';
+        }
+      });
+
+      deleteBtn.addEventListener('click', async () => {
+        if (!singleState.jobId) return;
+        await fetch(`/api/jobs/${singleState.jobId}`, { method: 'DELETE' });
+        addLog('已删除服务器文件');
+        resetSingleUI();
+      });
+
+      function resetSingleUI() {
+        singleState.jobId = null;
+        jobStatus.textContent = '待开始';
+        jobIdEl.textContent = '-';
+        jobTitle.textContent = '-';
+        statusDot.className = 'status-dot';
+        bar.style.width = '0%';
+        progressText.textContent = '0%';
+        downloadLink.style.display = 'none';
+        downloadLink.dataset.ready = 'false';
+        stopTreePolling();
+        treeOutput.textContent = '目录已删除';
+        treeMeta.textContent = '';
+      }
+
+      // ==== Batch Download ====
+      const batchState = { jobId: null, ws: null, albums: [], treeTimer: null };
+      const albumListEl = $('album-list');
+      const batchStats = $('batch-stats');
+      const batchStatus = $('batch-status');
+      const batchCompleted = $('batch-completed');
+      const batchTotal = $('batch-total');
+      const batchBar = $('batch-bar');
+      const batchProgressText = $('batch-progress-text');
+      const batchProgressContainer = $('batch-progress-container');
+      const batchDownloadLink = $('batch-download-link');
+      const batchCancelBtn = $('batch-cancel-btn');
+      const batchDeleteBtn = $('batch-delete-btn');
+
+      // Batch tree polling functions
+      async function fetchBatchTree() {
+        if (!batchState.jobId) return;
+        try {
+          const res = await fetch(`/api/batch-jobs/${batchState.jobId}/tree`);
+          if (res.status === 404) {
+            treeOutput.textContent = '目录已清理';
+            treeMeta.textContent = '任务不存在或已删除';
+            stopBatchTreePolling(false);
+            return;
+          }
+          if (!res.ok) throw new Error('failed');
+          const data = await res.json();
+          renderTree(data.tree, data.root, data.generated_at);
+        } catch (err) {
+          treeOutput.textContent = '无法读取目录';
+          treeMeta.textContent = '稍后重试';
+        }
+      }
+
+      function startBatchTreePolling() {
+        stopBatchTreePolling(false);
+        treeOutput.textContent = '加载中...';
+        treeMeta.textContent = '刷新中';
+        fetchBatchTree();
+        batchState.treeTimer = setInterval(fetchBatchTree, 1500);
+      }
+
+      function stopBatchTreePolling(clear = true) {
+        if (batchState.treeTimer) {
+          clearInterval(batchState.treeTimer);
+          batchState.treeTimer = null;
+        }
+        if (clear) {
+          treeOutput.textContent = '未加载';
+          treeMeta.textContent = '等待任务';
+        }
+      }
+
+      // Load saved credentials from localStorage
+      try {
+        const savedUsername = localStorage.getItem('jm_username');
+        const savedPassword = localStorage.getItem('jm_password');
+        const batchForm = document.getElementById('batch-form');
+        if (savedUsername) batchForm.username.value = savedUsername;
+        if (savedPassword) batchForm.password.value = savedPassword;
+      } catch (err) {
+        console.warn('Failed to load credentials from localStorage:', err);
+      }
+
+      function updateBatchUI(job) {
+        if (!job) return;
+        batchStatus.textContent = job.status === 'completed' ? '完成' :
+          job.status === 'failed' ? '失败' :
+            job.status === 'cancelled' ? '已取消' : '下载中';
+        batchCompleted.textContent = job.completed_albums || 0;
+        batchTotal.textContent = job.total_albums || 0;
+
+        const pct = Math.max(0, Math.min(1, job.progress || 0));
+        batchBar.style.width = `${(pct * 100).toFixed(1)}%`;
+        batchProgressText.textContent = `${(pct * 100).toFixed(1)}%`;
+      }
+
+      function renderAlbumList(albums) {
+        albumListEl.innerHTML = '';
+        batchState.albums = albums || [];
+
+        albums.forEach((album, idx) => {
+          const li = document.createElement('li');
+          li.className = 'album-item ' + album.status;
+          li.id = `album-${idx}`;
+
+          const icon = album.status === 'completed' ? '✅' :
+            album.status === 'partial' ? '⚠️' :
+              album.status === 'failed' ? '❌' :
+                album.status === 'downloading' ? '⬇️' : '⏳';
+
+          const retryBtn = album.status === 'failed'
+            ? `<button class="retry-btn" onclick="retryAlbum('${album.album_id}', ${idx})">🔄 重试</button>`
+            : '';
+
+          const retryInfo = album.retry_count > 0 ? ` (已重试${album.retry_count}次)` : '';
+          const partialInfo = album.status === 'partial' && album.failed_images
+            ? ` (${album.failed_images}张失败)`
+            : '';
+
+          li.innerHTML = `
+        <div class="album-icon">${icon}</div>
+        <div class="album-info">
+          <div class="album-title">${album.title}</div>
+          <div class="album-id">ID: ${album.album_id}${retryInfo}${partialInfo}</div>
+          ${album.error_message ? `<div class="album-error">${album.error_message}</div>` : ''}
+        </div>
+        ${album.status === 'downloading' ? `
+          <div class="mini-bar">
+            <div class="mini-bar-fill" style="width: ${(album.progress * 100).toFixed(1)}%"></div>
+          </div>
+        ` : album.status === 'failed' ? retryBtn : `
+          <div class="album-progress">${album.status === 'completed' ? '100%' : album.status === 'partial' ? '部分' : '等待'}</div>
+        `}
+      `;
+          albumListEl.appendChild(li);
+        });
+      }
+
+      // Global function for retry button onclick
+      window.retryAlbum = async function (albumId, index) {
+        if (!batchState.jobId) return;
+
+        const btn = document.querySelector(`#album-${index} .retry-btn`);
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = '重试中...';
+        }
+
+        try {
+          const res = await fetch(`/api/batch-jobs/${batchState.jobId}/albums/${albumId}/retry`, {
+            method: 'POST'
+          });
+          const data = await res.json();
+          if (data.status === 'success') {
+            addLog(`✅ 手动重试成功: ${data.album?.title || albumId}`);
+          } else {
+            addLog(`❌ 手动重试失败: ${data.error || '未知错误'}`);
+          }
+        } catch (err) {
+          addLog(`❌ 重试请求失败: ${err.message}`);
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = '🔄 重试';
+          }
+        }
+      };
+
+      function updateAlbumItem(index, album) {
+        if (!batchState.albums[index]) return;
+        batchState.albums[index] = { ...batchState.albums[index], ...album };
+        renderAlbumList(batchState.albums);
+      }
+
+      function handleBatchEvent(evt) {
+        if (!evt || !evt.type) return;
+        addLog(evt.message || evt.type);
+
+        switch (evt.type) {
+          case 'status':
+            batchStatus.textContent = evt.message || '处理中';
+            break;
+          case 'albums_list':
+            renderAlbumList(evt.albums || []);
+            batchTotal.textContent = (evt.albums || []).length;
+            batchStats.style.display = 'flex';
+            batchProgressContainer.style.display = 'block';
+            batchProgressText.style.display = 'block';
+            batchCancelBtn.style.display = 'inline-flex';
+            break;
+          case 'album_start':
+            if (evt.album) updateAlbumItem(evt.index, evt.album);
+            break;
+          case 'album_progress':
+            if (batchState.albums[evt.index]) {
+              batchState.albums[evt.index].progress = evt.progress;
+              renderAlbumList(batchState.albums);
+            }
+            break;
+          case 'album_completed':
+            if (evt.album) updateAlbumItem(evt.index, evt.album);
+            if (evt.job) updateBatchUI(evt.job);
+            break;
+          case 'album_partial':
+            if (evt.album) updateAlbumItem(evt.index, evt.album);
+            if (evt.job) updateBatchUI(evt.job);
+            addLog(`⚠️ 部分完成: ${evt.album?.title} (${evt.failed_count}/${evt.total_count} 图片失败)`);
+            break;
+          case 'album_failed':
+            if (evt.album) updateAlbumItem(evt.index, evt.album);
+            break;
+          case 'retry_phase':
+            batchStatus.textContent = evt.message || '正在重试失败任务...';
+            break;
+          case 'retry_start':
+            if (evt.album) updateAlbumItem(evt.index, evt.album);
+            batchStatus.textContent = evt.message || '重试中...';
+            break;
+          case 'retry_completed':
+            if (evt.album) updateAlbumItem(evt.index, evt.album);
+            break;
+          case 'retry_failed':
+            if (evt.album) updateAlbumItem(evt.index, evt.album);
+            break;
+          case 'failed_summary':
+            // Log all failed albums
+            (evt.failed_albums || []).forEach(a => {
+              addLog(`❌ 最终失败: ${a.title} (ID: ${a.album_id})`);
+            });
+            break;
+          case 'manual_retry_start':
+            if (evt.album) updateAlbumItem(evt.index, evt.album);
+            batchStatus.textContent = evt.message || '手动重试中...';
+            break;
+          case 'manual_retry_completed':
+            if (evt.album) updateAlbumItem(evt.index, evt.album);
+            batchStatus.textContent = '完成';
+            break;
+          case 'manual_retry_failed':
+            if (evt.album) updateAlbumItem(evt.index, evt.album);
+            break;
+          case 'packing':
+            batchStatus.textContent = '打包中...';
+            break;
+          case 'empty':
+            batchStatus.textContent = '收藏夹为空';
+            batchCancelBtn.style.display = 'none';
+            break;
+          case 'error':
+            batchStatus.textContent = '错误: ' + (evt.message || '');
+            batchCancelBtn.style.display = 'none';
+            break;
+          case 'cancelled':
+            batchStatus.textContent = evt.message || '已取消';
+            batchCancelBtn.style.display = 'none';
+            batchDeleteBtn.style.display = 'inline-flex';
+            // Show download for partial results (lazy zip)
+            if (evt.completed_count > 0) {
+              batchDownloadLink.textContent = `打包并下载 (${evt.completed_count}/${evt.total_count})`;
+              batchDownloadLink.style.display = 'inline-flex';
+              batchDownloadLink.dataset.ready = 'false';
+            }
+            stopBatchTreePolling(false);
+            break;
+          case 'zip_ready':
+            batchDownloadLink.href = evt.download;
+            batchDownloadLink.textContent = '下载 Zip';
+            batchDownloadLink.style.display = 'inline-flex';
+            batchDownloadLink.dataset.ready = 'true';
+            break;
+          case 'ready':
+            batchStatus.textContent = evt.message || '下载完成';
+            batchProgressText.textContent = '100%';
+            batchBar.style.width = '100%';
+            // Lazy zip - show button but not zipped yet
+            batchDownloadLink.textContent = '打包并下载';
+            batchDownloadLink.style.display = 'inline-flex';
+            batchDownloadLink.dataset.ready = 'false';
+            batchCancelBtn.style.display = 'none';
+            batchDeleteBtn.style.display = 'inline-flex';
+            stopBatchTreePolling(false);
+            break;
+          case 'snapshot':
+            if (evt.job) {
+              updateBatchUI(evt.job);
+              if (evt.job.albums) renderAlbumList(evt.job.albums);
+            }
+            (evt.events || []).forEach(e => handleBatchEvent(e));
+            break;
+        }
+      }
+
+      function openBatchSocket(jobId) {
+        if (batchState.ws) {
+          batchState.ws.close();
+        }
+        const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+        const ws = new WebSocket(`${proto}://${location.host}/ws/batch-jobs/${jobId}`);
+        batchState.ws = ws;
+        ws.onmessage = (evt) => {
+          try { handleBatchEvent(JSON.parse(evt.data)); } catch (e) { console.error(e); }
+        };
+        ws.onclose = () => addLog('批量下载 WebSocket 断开');
+      }
+
+      document.getElementById('batch-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = e.target.username.value.trim();
+        const password = e.target.password.value.trim();
+        if (!username || !password) return;
+
+        // Save credentials to localStorage
+        try {
+          localStorage.setItem('jm_username', username);
+          localStorage.setItem('jm_password', password);
+        } catch (err) {
+          console.warn('Failed to save credentials to localStorage:', err);
+        }
+
+        $('batch-start-btn').disabled = true;
+        logsEl.innerHTML = '';
+        albumListEl.innerHTML = '';
+        batchDownloadLink.style.display = 'none';
+        batchDeleteBtn.style.display = 'none';
+        batchStats.style.display = 'none';
+        batchProgressContainer.style.display = 'none';
+        batchProgressText.style.display = 'none';
+        batchBar.style.width = '0%';
+
+        addLog('正在登录并获取收藏夹...');
+
+        const res = await fetch('/api/batch-jobs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        if (!res.ok) {
+          addLog('创建批量任务失败');
+          $('batch-start-btn').disabled = false;
+          return;
+        }
+
+        const data = await res.json();
+        batchState.jobId = data.job_id;
+        batchStats.style.display = 'flex';
+        batchStatus.textContent = '连接中...';
+
+        openBatchSocket(batchState.jobId);
+        startBatchTreePolling();  // Start tree polling for batch downloads
+        $('batch-start-btn').disabled = false;
+      });
+
+      batchCancelBtn.addEventListener('click', async () => {
+        if (!batchState.jobId) return;
+        await fetch(`/api/batch-jobs/${batchState.jobId}/cancel`, { method: 'POST' });
+        addLog('已发送取消请求');
+      });
+
+      batchDeleteBtn.addEventListener('click', async () => {
+        if (!batchState.jobId) return;
+        await fetch(`/api/batch-jobs/${batchState.jobId}`, { method: 'DELETE' });
+        addLog('已删除服务器文件');
+        resetBatchUI();
+      });
+
+      // Batch download link - triggers prepare-download for lazy zip
+      batchDownloadLink.addEventListener('click', async (e) => {
+        if (batchDownloadLink.dataset.ready === 'true') {
+          return; // Already zipped
+        }
+        e.preventDefault();
+        if (!batchState.jobId) return;
+
+        batchDownloadLink.textContent = '打包中...';
+        batchDownloadLink.style.pointerEvents = 'none';
+
+        try {
+          const res = await fetch(`/api/batch-jobs/${batchState.jobId}/prepare-download`, { method: 'POST' });
+          if (!res.ok) {
+            const err = await res.json();
+            addLog('打包失败: ' + (err.detail || '未知错误'));
+            batchDownloadLink.textContent = '重试打包';
+            batchDownloadLink.style.pointerEvents = 'auto';
+            return;
+          }
+          const data = await res.json();
+          batchDownloadLink.href = data.download;
+          batchDownloadLink.dataset.ready = 'true';
+          batchDownloadLink.textContent = '下载 Zip';
+          batchDownloadLink.style.pointerEvents = 'auto';
+          batchDownloadLink.click();
+        } catch (err) {
+          addLog('打包请求失败');
+          batchDownloadLink.textContent = '重试打包';
+          batchDownloadLink.style.pointerEvents = 'auto';
+        }
+      });
+
+      function resetBatchUI() {
+        batchState.jobId = null;
+        batchStatus.textContent = '准备中';
+        batchCompleted.textContent = '0';
+        batchTotal.textContent = '0';
+        batchBar.style.width = '0%';
+        batchProgressText.textContent = '0%';
+        batchStats.style.display = 'none';
+        batchProgressContainer.style.display = 'none';
+        batchProgressText.style.display = 'none';
+        batchDownloadLink.style.display = 'none';
+        batchDownloadLink.dataset.ready = 'false';
+        batchDeleteBtn.style.display = 'none';
+        batchCancelBtn.style.display = 'none';
+        albumListEl.innerHTML = '';
+        stopBatchTreePolling();
+        treeOutput.textContent = '目录已删除';
+        treeMeta.textContent = '';
+      }
+
+      // ==== Cleanup Button ====
+      $('cleanup-btn').addEventListener('click', async () => {
+        addLog('正在清理所有数据...');
+        try {
+          await fetch('/api/cleanup', { method: 'DELETE' });
+          addLog('✅ 所有数据已清理');
+          resetSingleUI();
+          resetBatchUI();
+          logsEl.innerHTML = '';
+          addLog('系统已重置');
+        } catch (err) {
+          addLog('清理失败: ' + err.message);
+        }
+      });
+
+      // ==== State Restoration on Page Load ====
+      async function restoreState() {
+        // Try to restore single job
+        try {
+          const res = await fetch('/api/current-job');
+          const data = await res.json();
+          if (data.job) {
+            singleState.jobId = data.job.id;
+            jobIdEl.textContent = data.job.id;
+            jobTitle.textContent = data.job.title || '-';
+            setProgress(data.job.progress || 0);
+            setStatus(data.job.status, data.job.message || data.job.status);
+            if (data.job.status === 'completed') {
+              downloadLink.style.display = 'inline-flex';
+              downloadLink.textContent = data.job.zip_path ? '下载 Zip' : '打包并下载';
+              downloadLink.dataset.ready = data.job.zip_path ? 'true' : 'false';
+              if (data.job.zip_path) {
+                downloadLink.href = `/api/jobs/${data.job.id}/download`;
+              }
+            }
+            if (data.job.status === 'running') {
+              openSocket(data.job.id);
+              startTreePolling();
+            } else {
+              fetchTree();
+            }
+            addLog('[恢复] 发现上次的单本任务');
+          }
+        } catch (err) {
+          console.error('Failed to restore single job:', err);
+        }
+
+        // Try to restore batch job
+        try {
+          const res = await fetch('/api/current-batch-job');
+          const data = await res.json();
+          if (data.job) {
+            batchState.jobId = data.job.id;
+            batchState.albums = data.albums || [];
+            batchStats.style.display = 'flex';
+            batchStatus.textContent = data.job.status === 'running' ? '运行中' : data.job.message || data.job.status;
+            batchTotal.textContent = (data.albums || []).length;
+            const completedCount = (data.albums || []).filter(a => a.status === 'completed').length;
+            batchCompleted.textContent = completedCount;
+            batchProgressContainer.style.display = 'block';
+            batchProgressText.style.display = 'block';
+            const pct = data.job.progress || 0;
+            batchBar.style.width = `${(pct * 100).toFixed(1)}%`;
+            batchProgressText.textContent = `${(pct * 100).toFixed(1)}%`;
+            renderAlbumList(data.albums || []);
+
+            if (data.job.status === 'completed' || data.job.status === 'cancelled') {
+              batchDownloadLink.style.display = 'inline-flex';
+              batchDownloadLink.textContent = data.job.zip_path ? '下载 Zip' : '打包并下载';
+              batchDownloadLink.dataset.ready = data.job.zip_path ? 'true' : 'false';
+              if (data.job.zip_path) {
+                batchDownloadLink.href = `/api/batch-jobs/${data.job.id}/download`;
+              }
+              batchDeleteBtn.style.display = 'inline-flex';
+            }
+            if (data.job.status === 'running') {
+              openBatchSocket(data.job.id);
+              startBatchTreePolling();
+              batchCancelBtn.style.display = 'inline-flex';
+            } else {
+              fetchBatchTree();
+            }
+            addLog('[恢复] 发现上次的批量任务');
+            // Switch to batch tab
+            document.querySelector('.tab[data-tab="batch"]').click();
+          }
+        } catch (err) {
+          console.error('Failed to restore batch job:', err);
+        }
+      }
+
+      // Restore state when page loads
+      restoreState();
+    })();
+  </script>
 </body>
+
 </html>

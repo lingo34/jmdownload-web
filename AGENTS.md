@@ -1,5 +1,7 @@
 # Repository Guidelines
 
+项目使用 astral uv (uv add, uv run, uv remove)
+
 ## Project Structure & Module Organization
 - `main.py`: FastAPI app plus `JobManager` orchestrating JMComic downloads, progress WebSockets, zip creation, and temp cleanup. Most backend logic lives here; keep functions async-friendly.
 - `static/index.html`: Single-page UI that calls the REST endpoints and `/ws/{job_id}` WebSocket; update this directly (no build pipeline).
