@@ -1,6 +1,6 @@
 services:
   void-halo:
-    image: ghcr.io/${GHCR_OWNER:-your-gh-username}/void-halo:latest
+    image: ghcr.io/lingo34/void-halo:latest
     ports:
       - "7392:7392"
     environment:

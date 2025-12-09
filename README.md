@@ -29,7 +29,7 @@ python -m uvicorn main:app --reload --host 0.0.0.0 --port 7392
 直接使用 GHCR 镜像（由 GitHub Actions 自动构建）：
 
 ```bash
-docker run --rm -p 7392:7392 ghcr.io/<your-gh-username>/void-halo:latest
+docker run --rm -p 7392:7392 ghcr.io/lingo34/void-halo:latest
 ```
 
 docker-compose 示例（可自定义工作目录/挂载 tmpfs）：
@@ -37,7 +37,7 @@ docker-compose 示例（可自定义工作目录/挂载 tmpfs）：
 ```yaml
 services:
   void-halo:
-    image: ghcr.io/${GHCR_OWNER:-your-gh-username}/void-halo:latest
+    image: ghcr.io/lingo34/void-halo:latest
     ports:
       - "7392:7392"
     environment:
